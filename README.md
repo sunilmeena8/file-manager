@@ -1,2 +1,2 @@
-# secure-notes
-An android app to authenticate notes with fingerprint.
+# file-manager
+An android app to accesss files and folders.
