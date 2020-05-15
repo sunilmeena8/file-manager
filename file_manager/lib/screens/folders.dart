@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:core_file_manager/widgets/file_item.dart';
+import 'package:file_manager/widgets/file_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as pathlib;
-import 'package:core_file_manager/widgets/folder_item.dart';
-import 'package:core_file_manager/widgets/custom_alert.dart';
+import 'package:file_manager/widgets/folder_item.dart';
+import 'package:file_manager/widgets/custom_alert.dart';
 
 class Folder extends StatefulWidget{
   final String title,path;
@@ -17,6 +17,7 @@ class Folder extends StatefulWidget{
 
 class _FolderState extends State<Folder>{
   List<FileSystemEntity> files= List();
+  String title;
   List<String> paths = List();
   String path;
 
@@ -72,11 +73,14 @@ class _FolderState extends State<Folder>{
             ],
           ),
         ),
-      body: ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: ()=> getFiles(),
+        child: 
+          ListView.builder(
         itemCount: files.length,
         itemBuilder: (BuildContext context,int index){
           FileSystemEntity file = files[index];
-          List<String> splited = file.path.split('/'); 
+          
           return file.toString().split(":")[0] == "Directory"
           ? FolderItem(
             popTap: (v) async{
@@ -93,7 +97,9 @@ class _FolderState extends State<Folder>{
               folder: file,
               tap: (){
                 paths.add(file.path);
+                
                 setState(() {
+                  title = pathlib.basename(path);
                   path = file.path;
                 });
                 getFiles();
@@ -117,7 +123,7 @@ class _FolderState extends State<Folder>{
             );
         },
       ),
-      );
+      )  );
   }
   renameDialog(BuildContext context, String path, String type){
     final TextEditingController name = TextEditingController();

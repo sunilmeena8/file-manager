@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:core_file_manager/widgets/file_icon.dart';
-import 'package:core_file_manager/widgets/file_popup.dart';
+import 'package:file_manager/widgets/file_icon.dart';
+import 'package:file_manager/widgets/file_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';

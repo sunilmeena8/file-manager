@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'package:file_manager/widgets/file_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'folders.dart';
+import 'package:file_manager/utils/filesystem_utils.dart';
 
 class Home extends StatefulWidget {
   Home({Key key, this.title}) : super(key: key);
@@ -13,31 +16,58 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home>{
-  List<Directory> storages;
+  List<Directory> storages = List();
+  List<FileSystemEntity> recentFiles  = List();
   
   getStorageList() async {
     storages = await getExternalStorageDirectories();
     setState(() {
       
     });
+  }
+
+  getRecentFiles() async{
+    recentFiles = await FileSystemUtils.getRecentFiles(showHidden: false);
+ setState(() {
+      
+    });
     
   }
+
+setPermissions() async {
+    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if(permission != PermissionStatus.granted){
+      PermissionHandler().requestPermissions([PermissionGroup.storage]).then((v){
+      }).then((v) async{
+        PermissionStatus permission1 = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+        if(permission1 == PermissionStatus.granted){
+          getStorageList();
+          getRecentFiles();
+        }
+      });
+    }else{
+      getStorageList();
+      getRecentFiles();
+    }
+  }
+
 
   @override
   void initState() {
-        
+     setPermissions();
     super.initState();
-    getStorageList();
+    
   }
 
   @override
-  Widget build(BuildContext context){    
-    
+  Widget build(BuildContext context){   
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Container(
+      body: RefreshIndicator(
+              onRefresh: ()=> setPermissions(),
+              child: Container(
         child: ListView(
           padding: EdgeInsets.only(left: 20),
           
@@ -45,13 +75,14 @@ class _HomeState extends State<Home>{
             SizedBox(height: 20,),
             
             Text("Storage Devices",style: TextStyle(fontSize: 20),),
-            storages==null
+            storages==[]
             ? Center(
                 child: CircularProgressIndicator(),
             )
             :ListView.builder(
               shrinkWrap: true,
               padding: EdgeInsets.all(0),
+              physics: NeverScrollableScrollPhysics(),
               itemCount: storages.length,
               itemBuilder: (BuildContext context,int index){
                 FileSystemEntity item = storages[index];
@@ -107,12 +138,33 @@ class _HomeState extends State<Home>{
                            
                 );
               },
-            )
-            
+            ),
+            SizedBox(height: 30,),
+            Text(
+                  "Recent Files".toUpperCase(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17.0,
+                  ),
+                ),
+                SizedBox(height: 10,),
+                ListView.builder(
+                  padding: EdgeInsets.only(right: 20),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: recentFiles.length > 10?10:recentFiles.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    FileSystemEntity file = recentFiles[index];
+                    return file.existsSync()?FileItem(
+                      file: file,
+                    ):SizedBox();
+                  },
+                ),
           ]
 
         ),
 
+      )
       )
     );
   }
