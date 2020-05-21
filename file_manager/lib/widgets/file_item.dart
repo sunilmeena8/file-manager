@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 
-
 class FileItem extends StatelessWidget {
   final FileSystemEntity file;
   final Function popTap;

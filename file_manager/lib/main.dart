@@ -8,11 +8,12 @@ import 'screens/home.dart';
 import 'package:flutter_app_lock/flutter_app_lock.dart';
 import 'package:file_manager/screens/lock_screen.dart';
 
-void main() => runApp(AppLock(
-    builder: (args) => MyApp(data: args),
-    lockScreen: LockScreen(),
-    // enabled: false,
-  ));
+void main() => runApp(MyApp());
+// runApp(AppLock(
+//     builder: (args) => MyApp(data: args),
+//     lockScreen: LockScreen(),
+//     // enabled: false,
+//   ));
 
 class MyApp extends StatelessWidget {
   final String data;

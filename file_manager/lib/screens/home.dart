@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_manager/screens/contacts.dart';
 import 'package:file_manager/widgets/file_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -34,6 +35,21 @@ class _HomeState extends State<Home>{
     
   }
 
+setContactPermissions() async{
+  PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.contacts);
+    if(permission != PermissionStatus.granted){
+      PermissionHandler().requestPermissions([PermissionGroup.contacts]).then((v){
+      }).then((v) async{
+        PermissionStatus permission1 = await PermissionHandler().checkPermissionStatus(PermissionGroup.contacts);
+        if(permission1 == PermissionStatus.granted){
+          
+          
+        }
+      });
+    }else{
+      
+    }
+} 
 setPermissions() async {
     PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
     if(permission != PermissionStatus.granted){
@@ -41,6 +57,7 @@ setPermissions() async {
       }).then((v) async{
         PermissionStatus permission1 = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
         if(permission1 == PermissionStatus.granted){
+          setContactPermissions();
           getStorageList();
           getRecentFiles();
         }
@@ -160,6 +177,20 @@ setPermissions() async {
                     ):SizedBox();
                   },
                 ),
+            RaisedButton(
+            onPressed: (){
+              Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            child: Contacts(),
+                          ),
+                        );
+            } ,
+            child: const Text('Contacts', style: TextStyle(fontSize: 20)),
+          ),
+            SizedBox(height: 10,),
+            
           ]
 
         ),
